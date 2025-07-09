@@ -1,7 +1,7 @@
 from pygame import *
 from Pygine import *
 
-game = Game(800, 600, "Hello", 60, (255,255,255))
+game = Game(1280, 720, "Hello", 60, (255,255,255), fullscreen=True)
 
 def update():
     pass

@@ -26,9 +26,10 @@ class Game:
         background_image: Путь к изображению фона (опционально)
         *,
         create_display: bool = True,
+        fullscreen: bool = False,
 
     Пример:
-        >>> game = Game(800, 600, "Моя Игра")
+        >>> game = Game(800, 600, "Моя Игра", fullscreen=True)
         >>> player = AnimatedSprite("player.png", (32, 32))
         >>>
         >>> def update():
@@ -54,6 +55,7 @@ class Game:
         background_image: Optional[str] = None,
         *,
         create_display: bool = True,
+        fullscreen: bool = False,
     ):
         # Инициализируем pygame
         if not pygame.get_init():
@@ -65,18 +67,24 @@ class Game:
         self.title = title
         self.fps = fps
         self.background_color = background_color
+        self.fullscreen = fullscreen
 
         # Фоновое изображение (инициализируем переменные)
         self.background_image_path = background_image
         self.background_image = None
         self.background_surface = None
 
+        # Флаги для создания окна
+        flags = 0
+        if fullscreen:
+            flags |= pygame.FULLSCREEN
+
         # Создаём окно, только если об этом явно не попросили отказаться.
         if create_display:
-            self.screen = pygame.display.set_mode((width, height))
+            self.screen = pygame.display.set_mode((width, height), flags)
             pygame.display.set_caption(title)
         else:
-            # Если пользователь уже создал окно – забираем его.
+            # Если пользователь уже создал окно - забираем его.
             existing = pygame.display.get_surface()
             if existing is not None:
                 self.screen = existing
@@ -108,6 +116,19 @@ class Game:
         # Отладочная информация
         self.show_fps = False
         self.font = None
+
+    def toggle_fullscreen(self):
+        """
+        Переключить полноэкранный режим.
+        """
+        self.fullscreen = not self.fullscreen
+        flags = pygame.FULLSCREEN if self.fullscreen else 0
+        self.screen = pygame.display.set_mode((self.width, self.height), flags)
+        pygame.display.set_caption(self.title)
+
+        # При переключении режима нужно перезагрузить фоновое изображение
+        if self.background_image_path:
+            self._load_background_image(self.background_image_path)
 
     def _load_background_image(self, image_path: str) -> None:
         """
